@@ -4,6 +4,7 @@ import com.security.jwtoauth2.jwt.JWTFilter;
 import com.security.jwtoauth2.jwt.JWTUtil;
 import com.security.jwtoauth2.jwt.LoginFilter;
 import com.security.jwtoauth2.jwt.LogoutFilter;
+import com.security.jwtoauth2.jwt.service.CustomFomSuccessHandler;
 import com.security.jwtoauth2.oauth2.CustomOAuth2UserService;
 import com.security.jwtoauth2.oauth2.CustomSuccessHandler;
 import com.security.jwtoauth2.repository.RefreshRepository;
@@ -32,6 +33,7 @@ public class SecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomSuccessHandler customSuccessHandler;
+    private final CustomFomSuccessHandler customFomSuccessHandler;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
     private final RefreshRepository refreshRepository;
@@ -61,6 +63,7 @@ public class SecurityConfig {
 
                         // 허용 주소
                         configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+                        configuration.setAllowedOrigins(Collections.singletonList("http://localhost:8080"));
                         // 허용 메서드
                         configuration.setAllowedMethods(Collections.singletonList("*"));
                         // 프론트 서버에서 크리데이션 설정을 하면 여기서도 설정을 true 로 변경 해줘야함
@@ -81,7 +84,17 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable);
 
         // From 로그인 방식 disable
-        http.formLogin((auth) -> auth.disable());
+//        http.formLogin((auth) -> auth.disable());
+        http.formLogin((auth) -> auth
+                .loginPage("/loginPage")
+                .defaultSuccessUrl("/")
+                .failureUrl("/loginPage")
+                .usernameParameter("username")
+                .passwordParameter("password")
+                .loginProcessingUrl("/loginForm")
+                .successHandler(customFomSuccessHandler)
+//                .failureHandler()
+        );
 
         // http basic 인증 방식 disable
         http.httpBasic((auth) -> auth.disable());
@@ -89,7 +102,7 @@ public class SecurityConfig {
         // 경로별 인가 작업
         http.authorizeHttpRequests((auth) -> auth
                 // 모두허용
-                .requestMatchers("/", "/login", "/join").permitAll()
+                .requestMatchers("/", "/login", "/join","loginPage").permitAll()
                 // refresh 토큰으로 access 토큰 발급 경로
                 .requestMatchers("/reissue").permitAll()
                 // 어드민 한정 허용
