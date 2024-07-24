@@ -33,10 +33,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         if (registrationId.equals("naver")) {
 
             oAuth2Response = new NaverResponse(oAuth2User.getAttributes());
+            System.out.println("naver = " + oAuth2Response);
         }
         else if (registrationId.equals("google")) {
 
             oAuth2Response = new GoogleResponse(oAuth2User.getAttributes());
+            System.out.println("google = " + oAuth2Response);
         }
         else {
 
