@@ -7,19 +7,20 @@ import java.util.Map;
 
 @Data
 @RequiredArgsConstructor
-public class NaverResponse implements OAuth2Response {
-    private final Map<String,Object> attribute;
+public class GoogleResponse implements OAuth2Response{
+
+    private final Map<String, Object> attribute;
 
     @Override
     public String getProvider() {
 
-        return "naver";
+        return "google";
     }
 
     @Override
     public String getProviderId() {
 
-        return attribute.get("id").toString();
+        return attribute.get("sub").toString();
     }
 
     @Override
@@ -33,6 +34,4 @@ public class NaverResponse implements OAuth2Response {
 
         return attribute.get("name").toString();
     }
-
-
 }

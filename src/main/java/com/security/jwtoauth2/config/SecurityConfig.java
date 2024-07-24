@@ -4,6 +4,8 @@ import com.security.jwtoauth2.jwt.JWTFilter;
 import com.security.jwtoauth2.jwt.JWTUtil;
 import com.security.jwtoauth2.jwt.LoginFilter;
 import com.security.jwtoauth2.jwt.LogoutFilter;
+import com.security.jwtoauth2.oauth2.CustomOAuth2UserService;
+import com.security.jwtoauth2.oauth2.CustomSuccessHandler;
 import com.security.jwtoauth2.repository.RefreshRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,8 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomSuccessHandler customSuccessHandler;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
     private final RefreshRepository refreshRepository;
@@ -97,6 +101,12 @@ public class SecurityConfig {
         // JWTFilter  추가 LoginFilter 앞에 추가
         http.addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
 
+        //oauth2
+        http
+                .oauth2Login((oauth2) -> oauth2
+                        .userInfoEndpoint((userInfoEndpointConfig) -> userInfoEndpointConfig
+                                .userService(customOAuth2UserService))
+                        .successHandler(customSuccessHandler));
 
         //필터 추가 LoginFilter()는 인자를 받음 (AuthenticationManager() 메소드에 authenticationConfiguration 객체를 넣어야 함) 따라서 등록 필요
         http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration),jwtUtil,refreshRepository), UsernamePasswordAuthenticationFilter.class);

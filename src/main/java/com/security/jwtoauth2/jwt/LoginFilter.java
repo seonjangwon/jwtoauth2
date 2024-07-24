@@ -98,7 +98,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         addRefreshEntity(username, refresh, 86400000L);
 
         response.setHeader("access",access); // 로컬스토리지 저장
-        response.addCookie(creteCookie("refresh",refresh)); // httpOnly 쿠키 저장
+        response.addCookie(createCookie("refresh",refresh)); // httpOnly 쿠키 저장
         response.setStatus(HttpStatus.OK.value());
 
     }
@@ -121,7 +121,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         response.setStatus(401);
     }
 
-    private Cookie creteCookie(String key, String value){
+    private Cookie createCookie(String key, String value){
         Cookie cookie = new Cookie(key,value);
         cookie.setMaxAge(24*60*60);
         cookie.setSecure(true); // 이거는 https 로 진행 시 넣어준다
